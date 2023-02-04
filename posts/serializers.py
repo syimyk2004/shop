@@ -1,6 +1,9 @@
 from rest_framework import serializers
 
 from .models import Category, Product, Favorite, Order, Order_product
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class CategorySerializers(serializers.ModelSerializer):
@@ -10,12 +13,13 @@ class CategorySerializers(serializers.ModelSerializer):
         model = Category
         fields = '__all__'
 
-class ProductSerialzers(serializers.ModelSerializer):
+class ProductSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Product
         fields = "__all__"
 class FavoriteSerializers(serializers.ModelSerializer):
+    user = serializers.PrimaryKeyRelatedField(required=False, queryset=User.objects.all())
     class Meta:
         model = Favorite
         fields = "__all__"
