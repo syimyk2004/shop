@@ -23,7 +23,7 @@ class Category(models.Model):
     
 class Product(models.Model):
     name = models.CharField(max_length=100)
-    image = models.ImageField(upload_to='Product')
+    image = models.ImageField(upload_to='Product', null=True)
     description = models.TextField()
     price = models.PositiveIntegerField(null=True)
     quntity = models.PositiveSmallIntegerField(null=True, blank=True)
@@ -47,7 +47,24 @@ class Order(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
     extra_info = models.TextField()
 
+class Item(models.Model):
+    """Позиция."""
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='positions')
+    quantity = models.PositiveSmallIntegerField(default=0)   
+    price = models.DecimalField(decimal_places=2, max_digits=10)
 
+    def __str__(self):
+        return self.product.name
+
+    def get_cost(self):
+        return self.price * self.quantity
+
+    def save(self, *args, **kwargs):
+        if self.price is None:
+            self.price = self.product.price
+        super(Item, self).save(*args, **kwargs)
+    
 class Order_product(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, null=True)
